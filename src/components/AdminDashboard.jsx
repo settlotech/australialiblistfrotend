@@ -5,28 +5,113 @@ import {
   Layers, 
   CheckCircle2, 
   Search, 
-  Edit, 
   FileText, 
   Lock, 
   History, 
   Crown,
   PlusCircle,
   TrendingUp,
-  ExternalLink,
-  Sliders,
-  CheckCircle,
-  Database
+  X,
+  User,
+  Clock,
+  Laptop,
+  KeyRound,
+  ShieldAlert,
+  Send,
+  Sparkles,
+  Bot,
+  Upload,
+  FileCheck,
+  Check,
+  Loader2,
+  ChevronRight,
+  Info
 } from 'lucide-react';
 import { auditHistoryLogs } from '../data/mockData';
+
+// Detailed Bank Data: Registered Users, Policies Used & Login System Logs with Active Times
+const BANK_DETAILS = {
+  cba: {
+    users: [
+      { id: 'u1', name: 'Marcus Vance', role: 'Bank Owner', roleType: 'manager', dept: 'Executive Governance & Retail Operations', email: 'marcus.vance@cba.com.au', avatar: 'MV', lastActive: 'Active Now' },
+      { id: 'u2', name: 'Sarah Jenkins', role: 'Bank Employee (Maker)', roleType: 'employee', dept: 'Credit Operations Squad', email: 'sarah.jenkins@cba.com.au', avatar: 'SJ', lastActive: '12m ago' },
+      { id: 'u3', name: 'David Miller', role: 'Bank Employee (Reviewer)', roleType: 'employee', dept: 'InfoSec & Cyber Defense', email: 'david.miller@cba.com.au', avatar: 'DM', lastActive: '1h ago' },
+      { id: 'u4', name: 'Emma Watson', role: 'Bank Employee', roleType: 'employee', dept: 'Regulatory Compliance Audit', email: 'emma.watson@cba.com.au', avatar: 'EW', lastActive: 'Yesterday' }
+    ],
+    policies: [
+      { id: 'credit-card-limits-policy', code: 'CBA-POL-001', title: 'Credit Card Product Suite & Issuance Policy', version: 'v1.2', status: 'Enforced', type: 'Product Suite', summary: 'Tiered limit approvals, $50,000 maximum executive limit, and 3 direct in-system operational specifications.' },
+      { id: 'personal-loans-assessment-sop', code: 'CBA-POL-002', title: 'Personal Loans & Overdraft Assessment Procedure', version: 'v1.1', status: 'Enforced', type: 'Operational Procedure', summary: '+3.00% APRA serviceability buffer, $50,000 unsecured cap, and automated CDR income verification.' },
+      { id: 'customer-onboarding-sop', code: 'CBA-POL-003', title: 'Digital Customer Onboarding & Identity Verification SOP', version: 'v1.0', status: 'Enforced', type: 'SOP', summary: 'DVS Australian identity cross-match, Biometric face liveness >= 92%, and instant PEP sanctions screening.' },
+      { id: 'commercial-kyc-sop', code: 'CBA-POL-004', title: 'Commercial Entity KYC & Beneficial Ownership Guideline', version: 'v1.3', status: 'Enforced', type: 'Guideline', summary: 'Corporate customer due diligence, ASIC register check, and UBO >= 25% ownership validation.' },
+      { id: 'remote-access-security-policy', code: 'CBA-POL-005', title: 'Remote Access & Zero Trust Architecture Policy', version: 'v2.0', status: 'Enforced', type: 'Security Policy', summary: 'FIDO2 WebAuthn MFA, 15m idle session timeout, and mutual TLS token binding.' },
+      { id: 'privileged-access-sop', code: 'CBA-POL-006', title: 'Privileged Access Management & Segregation of Duties', version: 'v1.4', status: 'Enforced', type: 'SOP', summary: 'Just-in-time access provisioning, break-glass audit logs, and dual-authorization sign-off.' },
+      { id: 'aml-ctf-screening-policy', code: 'CBA-POL-007', title: 'AML/CTF Real-Time Transaction Monitoring Policy', version: 'v2.2', status: 'Enforced', type: 'Regulatory Policy', summary: 'AUSTRAC automated threshold detection, $10,000+ AUD cash TTR reporting, and 24h SMR escalation.' },
+      { id: 'cdr-privacy-policy', code: 'CBA-POL-008', title: 'Consumer Data Right (CDR) & Privacy Governance', version: 'v1.1', status: 'Enforced', type: 'Governance Policy', summary: 'Open Banking CDR API consent management, 7-year statutory retention, and one-click revocation dashboard.' }
+    ],
+    loginLogs: [
+      { id: 'log-1', user: 'Marcus Vance', role: 'Bank Owner', time: 'Active Now', loginTime: 'Oct 26, 2026, 09:14 AM AEST', duration: '2h 15m active', authMethod: 'FIDO2 Hardware Key (YubiKey 5C)', ip: '10.240.12.4 (Sydney CBD HQ)', status: 'Active Session' },
+      { id: 'log-2', user: 'Sarah Jenkins', role: 'Bank Employee', time: 'Active Now', loginTime: 'Oct 26, 2026, 10:20 AM AEST', duration: '1h 05m active', authMethod: 'OAuth 2.0 PKCE + Microsoft Entra SSO', ip: '10.240.18.29 (Sydney Lending Center)', status: 'Active Session' },
+      { id: 'log-3', user: 'David Miller', role: 'Bank Employee', time: '1 hour ago', loginTime: 'Oct 26, 2026, 08:30 AM AEST', duration: '1h 45m (Completed)', authMethod: 'Biometric FaceID + Passkey', ip: '192.168.4.12 (CBA Cyber Command)', status: 'Logged Out' },
+      { id: 'log-4', user: 'Emma Watson', role: 'Bank Employee', time: 'Yesterday', loginTime: 'Oct 25, 2026, 03:15 PM AEST', duration: '3h 20m (Expired)', authMethod: 'Hardware Token Step-Up', ip: '10.140.8.91 (Melbourne Branch)', status: 'Session Expired' }
+    ]
+  },
+  nab: {
+    users: [
+      { id: 'nu1', name: 'Rachel Wong', role: 'Regulatory Compliance Analyst', roleType: 'employee', dept: 'Prudential Compliance Desk', email: 'rachel.wong@nab.com.au', avatar: 'RW', lastActive: 'Active Now' },
+      { id: 'nu2', name: 'Julian Hayes', role: 'Head of Lending Risk', roleType: 'manager', dept: 'Credit Risk Committee', email: 'julian.hayes@nab.com.au', avatar: 'JH', lastActive: '45m ago' },
+      { id: 'nu3', name: 'Aaron Patel', role: 'Lead DevOps Engineer', roleType: 'employee', dept: 'Cloud Platform & Infrastructure', email: 'aaron.patel@nab.com.au', avatar: 'AP', lastActive: '3h ago' }
+    ],
+    policies: [
+      { id: 'nab-pol-1', code: 'NAB-CRD-01', title: 'NAB Consumer Credit Card Framework', version: 'v1.4', status: 'Enforced', type: 'Product Suite', summary: 'Revolving card credit limits up to $40,000, 24-hour SLA underwriting, and automated credit bureau checks.' },
+      { id: 'nab-pol-2', code: 'NAB-AML-02', title: 'Cross-Border AML Review & Sanctions Standard', version: 'v2.1', status: 'Enforced', type: 'Regulatory Policy', summary: 'Enhanced due diligence for international transfers > $2,500 AUD with real-time SWIFT sanction checks.' },
+      { id: 'nab-pol-3', code: 'NAB-OPS-03', title: 'APRA CPS 230 Operational Resilience Mandate', version: 'v1.0', status: 'Enforced', type: 'Prudential Standard', summary: 'Tier-1 critical operational business service continuity and recovery time objectives (RTO < 4h).' }
+    ],
+    loginLogs: [
+      { id: 'nlog-1', user: 'Rachel Wong', role: 'Compliance Analyst', time: 'Active Now', loginTime: 'Oct 26, 2026, 09:45 AM AEST', duration: '1h 30m active', authMethod: 'Okta SSO + FIDO2 Passkey', ip: '10.160.10.12 (Docklands Melbourne)', status: 'Active Session' },
+      { id: 'nlog-2', user: 'Julian Hayes', role: 'Head of Lending Risk', time: '45m ago', loginTime: 'Oct 26, 2026, 09:00 AM AEST', duration: '1h 15m (Completed)', authMethod: 'Hardware RSA Token Step-Up', ip: '10.160.14.88 (Docklands Melbourne)', status: 'Logged Out' },
+      { id: 'nlog-3', user: 'Aaron Patel', role: 'Lead DevOps', time: '3h ago', loginTime: 'Oct 26, 2026, 07:15 AM AEST', duration: '2h 00m (Completed)', authMethod: 'YubiKey 5 NFC Hardware Key', ip: '10.180.2.14 (Sydney Tech Hub)', status: 'Logged Out' }
+    ]
+  },
+  wbc: {
+    users: [
+      { id: 'wu1', name: 'Claire Beaumont', role: 'Westpac Head of Enterprise Compliance', roleType: 'manager', dept: 'Risk Oversight Division', email: 'claire.beaumont@westpac.com.au', avatar: 'CB', lastActive: 'Active Now' },
+      { id: 'wu2', name: 'Alex Chen', role: 'Digital Banking Tech Lead', roleType: 'employee', dept: 'Core Banking API Engineering', email: 'alex.chen@westpac.com.au', avatar: 'AC', lastActive: '2h ago' },
+      { id: 'wu3', name: 'Priya Sharma', role: 'Fraud Risk Officer', roleType: 'employee', dept: 'Financial Crime Intelligence', email: 'priya.sharma@westpac.com.au', avatar: 'PS', lastActive: 'Yesterday' }
+    ],
+    policies: [
+      { id: 'wbc-pol-1', code: 'WBC-TRSY-01', title: 'Automated Treasury API Dual-Authorization', version: 'v3.0', status: 'Enforced', type: 'Security Standard', summary: 'Cryptographic dual-authorization for automated treasury key rotations and limit ceiling variations.' },
+      { id: 'wbc-pol-2', code: 'WBC-CRD-02', title: 'Westpac Altitude Credit Card Issuance Protocol', version: 'v2.2', status: 'Enforced', type: 'Product Suite', summary: 'Tiered executive limit matrix, digital KYC liveness verification, and instant Apple Pay provisioning.' },
+      { id: 'wbc-pol-3', code: 'WBC-APP-03', title: 'Privacy Act APP 11 Data Retention Matrix', version: 'v1.5', status: 'Enforced', type: 'Privacy Policy', summary: '7-year statutory record preservation under Corporations Act with automated cryptographic purge.' }
+    ],
+    loginLogs: [
+      { id: 'wlog-1', user: 'Claire Beaumont', role: 'Head of Compliance', time: 'Active Now', loginTime: 'Oct 26, 2026, 08:50 AM AEST', duration: '2h 40m active', authMethod: 'PingIdentity + FIDO2 Security Key', ip: '10.210.1.5 (Barangaroo Sydney)', status: 'Active Session' },
+      { id: 'wlog-2', user: 'Alex Chen', role: 'Digital Tech Lead', time: '2h ago', loginTime: 'Oct 26, 2026, 08:10 AM AEST', duration: '1h 30m (Completed)', authMethod: 'OAuth 2.0 PKCE + GitHub Enterprise SSO', ip: '10.210.3.44 (Barangaroo Sydney)', status: 'Logged Out' },
+      { id: 'wlog-3', user: 'Priya Sharma', role: 'Fraud Risk Officer', time: 'Yesterday', loginTime: 'Oct 25, 2026, 02:40 PM AEST', duration: '4h 10m (Expired)', authMethod: 'SMS Step-Up 2FA + Duo Mobile', ip: '10.210.8.22 (Parramatta Tech Hub)', status: 'Session Expired' }
+    ]
+  },
+  anz: {
+    users: [
+      { id: 'au1', name: 'Arthur Pendelton', role: 'Chief Information Security Officer', roleType: 'manager', dept: 'AppSec & Enterprise Cyber', email: 'arthur.pendelton@anz.com.au', avatar: 'AP', lastActive: 'Active Now' },
+      { id: 'au2', name: 'Elena Rossi', role: 'Lead AppSec Engineer', roleType: 'employee', dept: 'Zero Trust Architecture', email: 'elena.rossi@anz.com.au', avatar: 'ER', lastActive: '30m ago' },
+      { id: 'au3', name: 'Liam O\'Connor', role: 'Credit Underwriter', roleType: 'employee', dept: 'Retail Credit Decisions', email: 'liam.oconnor@anz.com.au', avatar: 'LO', lastActive: 'Yesterday' }
+    ],
+    policies: [
+      { id: 'anz-pol-1', code: 'ANZ-BIO-01', title: 'Biometric & Passkey Enforcement Policy', version: 'v2.5', status: 'Enforced', type: 'Security Standard', summary: 'Mandatory WebAuthn biometric passkey verification on iOS 18+ and Android 15 mobile banking clients.' },
+      { id: 'anz-pol-2', code: 'ANZ-CRD-02', title: 'ANZ Rewards Credit Card Underwriting Policy', version: 'v1.8', status: 'Enforced', type: 'Product Suite', summary: 'Comprehensive credit reporting (CCR), debt-to-income <= 6x cap, and 24h digital turnaround.' },
+      { id: 'anz-pol-3', code: 'ANZ-NPP-03', title: 'New Payments Platform (NPP) ISO 20022 Compliance', version: 'v1.2', status: 'Enforced', type: 'Payment Rails', summary: 'Sub-second real-time PayID routing, PayTo mandate lifecycle, and Confirmation of Payee verification.' }
+    ],
+    loginLogs: [
+      { id: 'alog-1', user: 'Arthur Pendelton', role: 'CISO', time: 'Active Now', loginTime: 'Oct 26, 2026, 09:10 AM AEST', duration: '2h 20m active', authMethod: 'Hardware Token Step-Up + FIDO2', ip: '10.190.2.1 (ANZ Centre Docklands Melb)', status: 'Active Session' },
+      { id: 'alog-2', user: 'Elena Rossi', role: 'Lead AppSec Engineer', time: '30m ago', loginTime: 'Oct 26, 2026, 10:00 AM AEST', duration: '50m active', authMethod: 'Passkey WebAuthn Biometric', ip: '10.190.4.55 (ANZ Centre Docklands Melb)', status: 'Active Session' },
+      { id: 'alog-3', user: 'Liam O\'Connor', role: 'Credit Underwriter', time: 'Yesterday', loginTime: 'Oct 25, 2026, 04:00 PM AEST', duration: '2h 15m (Completed)', authMethod: 'OAuth 2.0 PKCE SSO', ip: '10.190.9.11 (Brisbane Branch)', status: 'Logged Out' }
+    ]
+  }
+};
 
 export default function AdminDashboard({ 
   banks, 
   policies, 
   onSelectBank, 
-  onOpenEditMasterModal,
-  onOpenBankCustomModal,
-  onOpenAddPolicyModal,
-  onOpenExportModal,
   onSwitchToLibraryView,
   onSelectPolicy
 }) {
@@ -34,6 +119,45 @@ export default function AdminDashboard({
   const [policySearch, setPolicySearch] = useState('');
   const [selectedDomainFilter, setSelectedDomainFilter] = useState('ALL');
   const [activeTab, setActiveTab] = useState('BANKS'); // 'BANKS' | 'POLICIES' | 'AUDIT'
+
+  // Bank Inspection State
+  const [inspectedBank, setInspectedBank] = useState(null);
+  const [inspectionTab, setInspectionTab] = useState('policies'); // 'policies' | 'users' | 'logs'
+  const [selectedInspectedPolicy, setSelectedInspectedPolicy] = useState(null);
+
+  // Add Master Policy Framework Modal State (Direct & AI Upload)
+  const [isAddFrameworkOpen, setIsAddFrameworkOpen] = useState(false);
+  const [addMode, setAddMode] = useState('direct'); // 'direct' | 'ai-upload'
+  const [uploadFile, setUploadFile] = useState(null);
+  const [isScanningWithAI, setIsScanningWithAI] = useState(false);
+  const [aiScanStep, setAiScanStep] = useState(0);
+  const [newStandard, setNewStandard] = useState({
+    title: '',
+    code: '',
+    domain: 'Prudential',
+    version: 'v1.0.0',
+    vision: '',
+    clauses: [
+      { id: 'SEC-01', title: 'Mandatory cryptographic asymmetric token signing' },
+      { id: 'SEC-02', title: 'Continuous automated vulnerability scanning & remediation' }
+    ],
+    telemetry: [
+      { metric: 'Approval SLA', target: '< 2.0 hrs' },
+      { metric: 'Auth Token Latency', target: '< 15ms' }
+    ]
+  });
+  const [frameworkPublishedSuccess, setFrameworkPublishedSuccess] = useState(false);
+
+  // Super Admin AI Chatbot State
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    {
+      id: 'msg-init',
+      sender: 'bot',
+      text: 'Good morning Ramesh! I am your Super Admin Navigation & Oversight Copilot. How can I help you govern the 4 subscribed member banks or navigate master standards today?'
+    }
+  ]);
+  const [chatInput, setChatInput] = useState('');
 
   const filteredBanks = banks.filter(b => 
     b.name.toLowerCase().includes(bankSearch.toLowerCase()) || 
@@ -51,8 +175,110 @@ export default function AdminDashboard({
     return matchesSearch && pol.breadcrumb.toLowerCase().includes(selectedDomainFilter.toLowerCase());
   });
 
+  // Open Bank Details Inspection Drawer
+  const handleOpenBankInspection = (bank, initialTab = 'policies') => {
+    setInspectedBank(bank);
+    setInspectionTab(initialTab);
+    const bankData = BANK_DETAILS[bank.id.toLowerCase()] || BANK_DETAILS.cba;
+    setSelectedInspectedPolicy(bankData.policies[0] || null);
+  };
+
+  // AI Document Upload Simulation
+  const handleSimulateAIScan = () => {
+    if (!uploadFile) return;
+    setIsScanningWithAI(true);
+    setAiScanStep(1);
+
+    setTimeout(() => setAiScanStep(2), 700);
+    setTimeout(() => setAiScanStep(3), 1500);
+    setTimeout(() => {
+      setIsScanningWithAI(false);
+      setAiScanStep(4);
+      // Auto-fill standard data from AI scan
+      setNewStandard({
+        title: 'APRA CPS 235: Cloud Security & Data Location Safeguards',
+        code: 'APRA CPS 235',
+        domain: 'Prudential',
+        version: 'v1.0.0',
+        vision: 'Authorizes cryptographic isolation and geographic data residency controls across sovereign cloud tenants for Australian ADIs.',
+        clauses: [
+          { id: 'CPS235-01', title: 'Data Sovereignty: Customer PII restricted to Australian onshore data centers' },
+          { id: 'CPS235-02', title: 'Zero Trust Enclave: Continuous hardware-attested workload verification' },
+          { id: 'CPS235-03', title: 'Exit Strategy: 48-hour automated multi-cloud failover protocol' }
+        ],
+        telemetry: [
+          { metric: 'Cross-Cloud Sync Latency', target: '< 45ms' },
+          { metric: 'Data Sovereignty Audit Score', target: '100% Pass' },
+          { metric: 'Attestation Uptime', target: '99.999%' }
+        ]
+      });
+    }, 2200);
+  };
+
+  // Handle Publishing Standard
+  const handlePublishStandard = (e) => {
+    e.preventDefault();
+    if (!newStandard.title) return;
+    setFrameworkPublishedSuccess(true);
+    setTimeout(() => {
+      setFrameworkPublishedSuccess(false);
+      setIsAddFrameworkOpen(false);
+    }, 1200);
+  };
+
+  // Super Admin Chatbot Send Message & Auto-Navigation Handler
+  const handleSendAdminChatMessage = (userPromptText) => {
+    const text = (userPromptText || chatInput).trim();
+    if (!text) return;
+
+    const userMsg = { id: `u-${Date.now()}`, sender: 'user', text };
+    setChatMessages(prev => [...prev, userMsg]);
+    setChatInput('');
+
+    const lower = text.toLowerCase();
+    let replyText = '';
+
+    if (lower.includes('cba') || lower.includes('commonwealth')) {
+      const cbaBank = banks.find(b => b.id.toLowerCase() === 'cba') || banks[0];
+      handleOpenBankInspection(cbaBank, lower.includes('log') ? 'logs' : lower.includes('user') ? 'users' : 'policies');
+      replyText = `Opening **Commonwealth Bank of Australia (CBA)** inspection. CBA currently has 4 registered users, 8 active policies, and 2 active sessions.`;
+    } else if (lower.includes('nab')) {
+      const nabBank = banks.find(b => b.id.toLowerCase() === 'nab') || banks[1];
+      handleOpenBankInspection(nabBank, lower.includes('log') ? 'logs' : lower.includes('user') ? 'users' : 'policies');
+      replyText = `Opening **National Australia Bank (NAB)** inspection. NAB currently has 3 registered users and 9 custom conditions configured.`;
+    } else if (lower.includes('westpac') || lower.includes('wbc')) {
+      const wbcBank = banks.find(b => b.id.toLowerCase() === 'wbc') || banks[2];
+      handleOpenBankInspection(wbcBank, lower.includes('log') ? 'logs' : lower.includes('user') ? 'users' : 'policies');
+      replyText = `Opening **Westpac Banking Corp (WBC)** inspection. Showing active policies and login records.`;
+    } else if (lower.includes('anz')) {
+      const anzBank = banks.find(b => b.id.toLowerCase() === 'anz') || banks[3];
+      handleOpenBankInspection(anzBank, lower.includes('log') ? 'logs' : lower.includes('user') ? 'users' : 'policies');
+      replyText = `Opening **ANZ Banking Group (ANZ)** inspection details.`;
+    } else if (lower.includes('standard') || lower.includes('framework') || lower.includes('library') || lower.includes('master')) {
+      setActiveTab('POLICIES');
+      replyText = `Navigated to **Master Library Standards** tab. You are governing ${policyList.length} master frameworks.`;
+    } else if (lower.includes('audit') || lower.includes('history')) {
+      setActiveTab('AUDIT');
+      replyText = `Switched to **Audit History & Activity Log** tab.`;
+    } else if (lower.includes('add') || lower.includes('upload') || lower.includes('create standard')) {
+      setIsAddFrameworkOpen(true);
+      if (lower.includes('upload') || lower.includes('ai')) setAddMode('ai-upload');
+      replyText = `Opening **Add Master Policy Framework** modal with AI ingestion support.`;
+    } else {
+      replyText = `I can help you inspect bank tenants, check registered users, view user login system logs & active times, or navigate master standards. Try: "Inspect CBA user logs" or "Navigate to Master Standards".`;
+    }
+
+    setTimeout(() => {
+      setChatMessages(prev => [...prev, { id: `b-${Date.now()}`, sender: 'bot', text: replyText }]);
+    }, 400);
+  };
+
+  const currentBankData = inspectedBank 
+    ? (BANK_DETAILS[inspectedBank.id.toLowerCase()] || BANK_DETAILS.cba)
+    : null;
+
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#f8fafc] p-6 sm:p-8 space-y-6 text-xs">
+    <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#f8fafc] p-6 sm:p-8 space-y-6 text-xs relative">
       {/* 1. Header Banner */}
       <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -68,15 +294,15 @@ export default function AdminDashboard({
                 Master Governance
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-1">
-              Centrally authoring and governing {policyList.length} master regulatory standards across 4 Subscribed Australian Tier-1 Banks.
-            </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
-            onClick={onOpenAddPolicyModal}
+            onClick={() => {
+              setIsAddFrameworkOpen(true);
+              setAddMode('direct');
+            }}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition shadow-xs cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
@@ -140,9 +366,6 @@ export default function AdminDashboard({
               <h3 className="text-sm font-bold text-slate-900">
                 Connected Institutional Tenants & Policy Addenda
               </h3>
-              <p className="text-xs text-slate-500">
-                Each member bank subscribes to the government master baseline and configures authorized operational addenda.
-              </p>
             </div>
 
             <div className="relative w-72">
@@ -170,57 +393,64 @@ export default function AdminDashboard({
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {filteredBanks.map((bank) => (
-                  <tr key={bank.id} className="hover:bg-slate-50 transition">
-                    <td className="py-3.5 px-4">
-                      <div className="font-bold text-slate-900 text-xs">{bank.name}</div>
-                      <div className="text-[11px] text-slate-500">{bank.tier} • {bank.contactEmail}</div>
-                    </td>
+                {filteredBanks.map((bank) => {
+                  const bData = BANK_DETAILS[bank.id.toLowerCase()] || BANK_DETAILS.cba;
+                  return (
+                    <tr 
+                      key={bank.id} 
+                      onClick={() => handleOpenBankInspection(bank, 'policies')}
+                      className="hover:bg-blue-50/50 transition cursor-pointer group"
+                      title="Click to inspect users, active policies & login logs"
+                    >
+                      <td className="py-3.5 px-4">
+                        <div className="font-bold text-slate-900 text-xs group-hover:text-blue-700 transition flex items-center gap-1.5">
+                          <span>{bank.name}</span>
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition" />
+                        </div>
+                        <div className="text-[11px] text-slate-500">{bank.tier} • {bData.users.length} Registered Users</div>
+                      </td>
 
-                    <td className="py-3.5 px-4">
-                      <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                        {bank.subscriptionStatus}
-                      </span>
-                    </td>
+                      <td className="py-3.5 px-4">
+                        <span className="text-[11px] font-semibold bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                          {bank.subscriptionStatus}
+                        </span>
+                      </td>
 
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <div className="text-[11px] font-bold text-slate-800">{bank.activeAddendaCount} Active Custom Conditions</div>
-                      <div className="text-[10.5px] text-slate-500 truncate">{bank.addendaSummary}</div>
-                    </td>
+                      <td className="py-3.5 px-4 max-w-xs">
+                        <div className="text-[11px] font-bold text-slate-800">
+                          {bData.policies.length} Active Subscribed Policies
+                        </div>
+                        <div className="text-[10.5px] text-slate-500 truncate">{bank.addendaSummary}</div>
+                      </td>
 
-                    <td className="py-3.5 px-4">
-                      <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 w-fit">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                        {bank.complianceStatus}
-                      </span>
-                    </td>
+                      <td className="py-3.5 px-4">
+                        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1 w-fit">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          {bank.complianceStatus}
+                        </span>
+                      </td>
 
-                    <td className="py-3.5 px-4 text-slate-600 font-medium">
-                      {bank.lastAuditDate}
-                    </td>
+                      <td className="py-3.5 px-4 text-slate-600 font-medium">
+                        {bank.lastAuditDate}
+                      </td>
 
-                    <td className="py-3.5 px-4 text-right space-x-2">
-                      <button
-                        onClick={() => {
-                          onSelectBank(bank);
-                          onOpenBankCustomModal('oauth-sso', bank);
-                        }}
-                        className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
-                      >
-                        Inspect Addenda
-                      </button>
-                      <button
-                        onClick={() => {
-                          onSelectBank(bank);
-                          onOpenExportModal();
-                        }}
-                        className="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
-                      >
-                        Audit Cert
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      <td className="py-3.5 px-4 text-right space-x-2" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => handleOpenBankInspection(bank, 'policies')}
+                          className="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
+                        >
+                          Inspect Bank
+                        </button>
+                        <button
+                          onClick={() => handleOpenBankInspection(bank, 'logs')}
+                          className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 font-bold px-3 py-1 rounded text-xs transition cursor-pointer"
+                        >
+                          User Logs
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -235,9 +465,6 @@ export default function AdminDashboard({
               <h3 className="text-sm font-bold text-slate-900">
                 Master Banking Regulatory Standards ({filteredPolicies.length} of {policyList.length})
               </h3>
-              <p className="text-xs text-slate-500">
-                Government-approved reference frameworks authored centrally. All changes immediately propagate to member bank tenants.
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2.5">
@@ -263,14 +490,6 @@ export default function AdminDashboard({
                 <option value="AML">AML/CTF Financial Crime</option>
                 <option value="Payment">Payment Rails & API</option>
               </select>
-
-              <button
-                onClick={onOpenAddPolicyModal}
-                className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-1.5 rounded-lg text-xs transition cursor-pointer shadow-2xs"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Add Framework</span>
-              </button>
             </div>
           </div>
 
@@ -328,25 +547,9 @@ export default function AdminDashboard({
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs">
+                <div className="pt-2 border-t border-slate-200 flex justify-between items-center text-xs">
                   <span className="text-emerald-700 font-bold text-[11px]">{pol.complianceLevel}</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        if (onSelectPolicy) onSelectPolicy(pol.id);
-                        onSwitchToLibraryView();
-                      }}
-                      className="text-xs text-slate-700 hover:text-slate-900 font-semibold flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded hover:bg-slate-50 cursor-pointer"
-                    >
-                      <ExternalLink className="w-3 h-3" /> View in Library
-                    </button>
-                    <button
-                      onClick={() => onOpenEditMasterModal(pol.id)}
-                      className="text-xs text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded hover:bg-blue-100 cursor-pointer"
-                    >
-                      <Edit className="w-3 h-3" /> Edit Master Spec
-                    </button>
-                  </div>
+                  <span className="text-[10.5px] text-slate-400 font-mono">Enforced across 4 Tier-1 Banks</span>
                 </div>
               </div>
             ))}
@@ -361,9 +564,6 @@ export default function AdminDashboard({
             <h3 className="text-sm font-bold text-slate-900">
               Regulatory Audit History & Addenda Modifications
             </h3>
-            <p className="text-xs text-slate-500">
-              Immutable logging of master policy publications and bank-specific addenda revisions.
-            </p>
           </div>
 
           <div className="space-y-3">
@@ -395,6 +595,633 @@ export default function AdminDashboard({
           </div>
         </div>
       )}
+
+      {/* ------------------- BANK INSPECTION MODAL / DRAWER ------------------- */}
+      {inspectedBank && currentBankData && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900">{inspectedBank.name}</h3>
+                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
+                    <span>{inspectedBank.tier}</span>
+                    <span>•</span>
+                    <span className="text-emerald-700 font-semibold">{inspectedBank.complianceStatus}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setInspectedBank(null)}
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Top Metric Bar */}
+            <div className="grid grid-cols-3 gap-3 p-4 bg-white border-b border-slate-200">
+              <div 
+                onClick={() => setInspectionTab('users')}
+                className={`p-3 rounded-xl border transition cursor-pointer ${
+                  inspectionTab === 'users' ? 'bg-blue-50/70 border-blue-300' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Registered Bank Users</span>
+                </div>
+                <div className="text-lg font-extrabold text-slate-900 mt-1">{currentBankData.users.length} Active Members</div>
+                <div className="text-[10.5px] text-slate-500">Click to view roster & permissions</div>
+              </div>
+
+              <div 
+                onClick={() => setInspectionTab('policies')}
+                className={`p-3 rounded-xl border transition cursor-pointer ${
+                  inspectionTab === 'policies' ? 'bg-blue-50/70 border-blue-300' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Subscribed Policies</span>
+                </div>
+                <div className="text-lg font-extrabold text-slate-900 mt-1">{currentBankData.policies.length} Active Policies</div>
+                <div className="text-[10.5px] text-slate-500">Click to inspect active policy rules</div>
+              </div>
+
+              <div 
+                onClick={() => setInspectionTab('logs')}
+                className={`p-3 rounded-xl border transition cursor-pointer ${
+                  inspectionTab === 'logs' ? 'bg-blue-50/70 border-blue-300' : 'bg-slate-50 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <div className="text-[11px] font-bold text-slate-500 uppercase flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Login Logs & Active Times</span>
+                </div>
+                <div className="text-lg font-extrabold text-slate-900 mt-1">
+                  {currentBankData.loginLogs.filter(l => l.status === 'Active Session').length} Online Now
+                </div>
+                <div className="text-[10.5px] text-slate-500">Click to inspect user system logs</div>
+              </div>
+            </div>
+
+            {/* Inspection Tab Navigation */}
+            <div className="flex items-center gap-2 px-5 pt-3 border-b border-slate-200 bg-white">
+              <button
+                onClick={() => setInspectionTab('policies')}
+                className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer ${
+                  inspectionTab === 'policies'
+                    ? 'border-blue-600 text-blue-700'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Subscribed Policies ({currentBankData.policies.length})
+              </button>
+              <button
+                onClick={() => setInspectionTab('users')}
+                className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer ${
+                  inspectionTab === 'users'
+                    ? 'border-blue-600 text-blue-700'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Registered Bank Users ({currentBankData.users.length})
+              </button>
+              <button
+                onClick={() => setInspectionTab('logs')}
+                className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer ${
+                  inspectionTab === 'logs'
+                    ? 'border-blue-600 text-blue-700'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                User Login System Logs & Active Times ({currentBankData.loginLogs.length})
+              </button>
+            </div>
+
+            {/* Inspection Content Area */}
+            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar bg-slate-50/50">
+              {/* TAB A: Subscribed Policies */}
+              {inspectionTab === 'policies' && (
+                <div className="space-y-3">
+                  <div className="text-xs text-slate-600 font-medium">
+                    Showing operational standards enforced for <strong>{inspectedBank.name}</strong>. Click any policy to view rules and limits.
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {currentBankData.policies.map((p) => {
+                      const isSelected = selectedInspectedPolicy?.id === p.id;
+                      return (
+                        <div
+                          key={p.id}
+                          onClick={() => setSelectedInspectedPolicy(p)}
+                          className={`p-3.5 rounded-xl border transition cursor-pointer ${
+                            isSelected 
+                              ? 'bg-blue-50/80 border-blue-400 shadow-xs ring-1 ring-blue-300' 
+                              : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-mono text-[10.5px] font-bold text-blue-700 bg-blue-100/60 px-1.5 py-0.5 rounded">
+                              {p.code}
+                            </span>
+                            <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                              {p.status}
+                            </span>
+                          </div>
+                          <h4 className="font-extrabold text-slate-900 text-xs mt-1.5">{p.title}</h4>
+                          <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">{p.summary}</p>
+                          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-500">
+                            <span>Type: <strong>{p.type}</strong></span>
+                            <span className="font-mono font-bold text-slate-700">{p.version}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB B: Bank Users */}
+              {inspectionTab === 'users' && (
+                <div className="space-y-3">
+                  <div className="text-xs text-slate-600 font-medium">
+                    List of all registered bank personnel for <strong>{inspectedBank.name}</strong> and their system status.
+                  </div>
+                  <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-200">
+                          <th className="py-2.5 px-4">User Name</th>
+                          <th className="py-2.5 px-4">Role & Access Type</th>
+                          <th className="py-2.5 px-4">Department Squad</th>
+                          <th className="py-2.5 px-4">Work Email</th>
+                          <th className="py-2.5 px-4 text-right">Last Active</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {currentBankData.users.map((u) => (
+                          <tr key={u.id} className="hover:bg-slate-50/80 transition">
+                            <td className="py-3 px-4 font-bold text-slate-900 flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-slate-900 text-white flex items-center justify-center text-[10px] font-extrabold">
+                                {u.avatar}
+                              </div>
+                              <span>{u.name}</span>
+                            </td>
+                            <td className="py-3 px-4">
+                              <span className={`text-[10.5px] font-bold px-2 py-0.5 rounded-full border ${
+                                u.roleType === 'manager' 
+                                  ? 'bg-amber-50 text-amber-900 border-amber-200' 
+                                  : 'bg-blue-50 text-blue-900 border-blue-200'
+                              }`}>
+                                {u.role}
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-slate-700 text-[11px]">{u.dept}</td>
+                            <td className="py-3 px-4 text-slate-500 font-mono text-[11px]">{u.email}</td>
+                            <td className="py-3 px-4 text-right">
+                              <span className={`font-semibold ${
+                                u.lastActive.includes('Active Now') ? 'text-emerald-700 font-bold' : 'text-slate-500'
+                              }`}>
+                                {u.lastActive}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* TAB C: Login System Logs & Active Times */}
+              {inspectionTab === 'logs' && (
+                <div className="space-y-3">
+                  <div className="text-xs text-slate-600 font-medium">
+                    Immutable security login session records and active operational times for <strong>{inspectedBank.name}</strong>.
+                  </div>
+                  <div className="space-y-2.5">
+                    {currentBankData.loginLogs.map((l) => (
+                      <div
+                        key={l.id}
+                        className="p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold flex-shrink-0 mt-0.5 ${
+                            l.status === 'Active Session' 
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                              : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          }`}>
+                            <KeyRound className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-slate-900">{l.user}</span>
+                              <span className="text-[11px] text-slate-500">({l.role})</span>
+                              <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full border ${
+                                l.status === 'Active Session'
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                  : 'bg-slate-100 text-slate-600 border-slate-200'
+                              }`}>
+                                {l.status}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 mt-0.5">
+                              Auth Method: <strong className="text-slate-700">{l.authMethod}</strong> • IP: <span className="font-mono">{l.ip}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <div className="font-bold text-slate-900 text-[11.5px] flex items-center gap-1 justify-end">
+                            <Clock className="w-3.5 h-3.5 text-blue-600" />
+                            <span>{l.duration}</span>
+                          </div>
+                          <div className="text-[10.5px] text-slate-500">{l.loginTime}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs">
+              <span className="text-slate-500">
+                Connected tenant: <strong>{inspectedBank.id.toUpperCase()}</strong> • Enterprise Gateway
+              </span>
+              <button
+                onClick={() => setInspectedBank(null)}
+                className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-1.5 rounded-lg text-xs transition cursor-pointer"
+              >
+                Close Inspection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------- ADD MASTER POLICY FRAMEWORK MODAL (WITH AI UPLOAD) ------------------- */}
+      {isAddFrameworkOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+                  <PlusCircle className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900">Add Master Policy Framework</h3>
+                  <p className="text-xs text-slate-500">Create directly or upload documents for AI regulatory ingestion</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsAddFrameworkOpen(false)}
+                className="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Mode Switcher Tabs */}
+            <div className="flex border-b border-slate-200 bg-white px-5 pt-3 gap-3">
+              <button
+                type="button"
+                onClick={() => setAddMode('direct')}
+                className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${
+                  addMode === 'direct'
+                    ? 'border-blue-600 text-blue-700'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>Direct Document Creation</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAddMode('ai-upload')}
+                className={`pb-2.5 px-3 text-xs font-bold border-b-2 transition cursor-pointer flex items-center gap-1.5 ${
+                  addMode === 'ai-upload'
+                    ? 'border-blue-600 text-blue-700'
+                    : 'border-transparent text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+                <span>AI Regulatory Ingestion / Upload Option</span>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-4">
+              {frameworkPublishedSuccess ? (
+                <div className="p-8 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                    <Check className="w-6 h-6 stroke-[3]" />
+                  </div>
+                  <h4 className="text-sm font-extrabold text-slate-900">Master Policy Framework Published!</h4>
+                  <p className="text-xs text-slate-500">Standard propagated instantly to all 4 Subscribed Member Banks.</p>
+                </div>
+              ) : addMode === 'ai-upload' ? (
+                <div className="space-y-4">
+                  <div className="border-2 border-dashed border-blue-200 rounded-2xl p-6 text-center bg-blue-50/40 space-y-3">
+                    <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mx-auto">
+                      <Upload className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-extrabold text-slate-900 text-xs">Upload Master Regulatory Standard Document</h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">Supports PDF, DOCX, or JSON regulatory baseline specifications</p>
+                    </div>
+
+                    <input
+                      type="file"
+                      id="master-ai-doc-upload"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) setUploadFile(e.target.files[0]);
+                      }}
+                    />
+                    <label
+                      htmlFor="master-ai-doc-upload"
+                      className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition cursor-pointer shadow-xs"
+                    >
+                      <FileCheck className="w-3.5 h-3.5" />
+                      <span>{uploadFile ? uploadFile.name : 'Select Document File'}</span>
+                    </label>
+                  </div>
+
+                  {uploadFile && (
+                    <div className="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900 text-xs">AI Extraction Pipeline</span>
+                        <button
+                          type="button"
+                          onClick={handleSimulateAIScan}
+                          disabled={isScanningWithAI}
+                          className="bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold px-3 py-1 rounded text-xs transition flex items-center gap-1.5 cursor-pointer"
+                        >
+                          {isScanningWithAI ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                          <span>{isScanningWithAI ? 'Extracting with AI...' : 'Scan & Extract with AI'}</span>
+                        </button>
+                      </div>
+
+                      {aiScanStep > 0 && (
+                        <div className="space-y-1 text-[11px] font-medium text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                          {aiScanStep >= 1 && <div className="text-blue-700">✓ Ingesting {uploadFile.name} text structure...</div>}
+                          {aiScanStep >= 2 && <div className="text-blue-700">✓ Parsing APRA/AUSTRAC statutory clauses...</div>}
+                          {aiScanStep >= 3 && <div className="text-blue-700">✓ Aligning monitored telemetry baselines...</div>}
+                          {aiScanStep >= 4 && <div className="text-emerald-700 font-bold">✓ Standard extracted! Ready to review and publish below.</div>}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Pre-populated form preview after scan */}
+                  {aiScanStep >= 4 && (
+                    <div className="space-y-3 border-t border-slate-200 pt-3">
+                      <div>
+                        <label className="font-bold text-slate-700 text-[11px] block mb-1">Standard Title</label>
+                        <input
+                          type="text"
+                          value={newStandard.title}
+                          onChange={(e) => setNewStandard({ ...newStandard, title: e.target.value })}
+                          className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 outline-none"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="font-bold text-slate-700 text-[11px] block mb-1">Standard Code</label>
+                          <input
+                            type="text"
+                            value={newStandard.code}
+                            onChange={(e) => setNewStandard({ ...newStandard, code: e.target.value })}
+                            className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="font-bold text-slate-700 text-[11px] block mb-1">Domain</label>
+                          <select
+                            value={newStandard.domain}
+                            onChange={(e) => setNewStandard({ ...newStandard, domain: e.target.value })}
+                            className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 outline-none"
+                          >
+                            <option value="Prudential">APRA Prudential</option>
+                            <option value="Privacy">Privacy & Data Governance</option>
+                            <option value="AML">AML/CTF Financial Crime</option>
+                            <option value="Payment">Payment Rails & API</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                /* Direct Document Creation Mode */
+                <form onSubmit={handlePublishStandard} className="space-y-3">
+                  <div>
+                    <label className="font-bold text-slate-700 text-[11px] block mb-1">Master Standard Title</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. APRA CPS 235 Cloud Security & Data Location Safeguards"
+                      value={newStandard.title}
+                      onChange={(e) => setNewStandard({ ...newStandard, title: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="font-bold text-slate-700 text-[11px] block mb-1">Regulatory Code</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. APRA CPS 235"
+                        value={newStandard.code}
+                        onChange={(e) => setNewStandard({ ...newStandard, code: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-bold text-slate-700 text-[11px] block mb-1">Regulatory Domain</label>
+                      <select
+                        value={newStandard.domain}
+                        onChange={(e) => setNewStandard({ ...newStandard, domain: e.target.value })}
+                        className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 outline-none cursor-pointer"
+                      >
+                        <option value="Prudential">APRA Prudential</option>
+                        <option value="Privacy">Privacy & Data Governance</option>
+                        <option value="AML">AML/CTF Financial Crime</option>
+                        <option value="Payment">Payment Rails & API</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 text-[11px] block mb-1">Vision & Mandatory Baseline Statement</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Specify baseline regulatory mandate and cross-bank operational rules..."
+                      value={newStandard.vision}
+                      onChange={(e) => setNewStandard({ ...newStandard, vision: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs text-slate-900 outline-none focus:bg-white focus:border-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-bold text-slate-700 text-[11px] block mb-1">Statutory Clauses (Direct in-system document parameters)</label>
+                    <div className="space-y-1.5 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                      {newStandard.clauses.map((c, i) => (
+                        <div key={i} className="text-[11px] text-slate-700 flex items-center gap-1.5">
+                          <strong className="text-blue-900">{c.id}:</strong>
+                          <span>{c.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </form>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center text-xs">
+              <button
+                type="button"
+                onClick={() => setIsAddFrameworkOpen(false)}
+                className="text-slate-600 hover:text-slate-900 font-bold px-3 py-1.5 rounded transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handlePublishStandard}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition cursor-pointer shadow-xs"
+              >
+                Publish Master Framework
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------- SUPER ADMIN AI NAVIGATION CHATBOT ------------------- */}
+      <div className="fixed bottom-6 right-6 z-40">
+        {!isChatOpen ? (
+          <button
+            onClick={() => setIsChatOpen(true)}
+            className="flex items-center gap-2.5 bg-slate-900 hover:bg-blue-900 text-white px-4 py-3 rounded-2xl shadow-xl transition hover:scale-105 cursor-pointer border border-slate-700"
+            title="Open Super Admin AI Copilot"
+          >
+            <div className="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+              <Bot className="w-4 h-4" />
+            </div>
+            <div className="text-left">
+              <div className="font-extrabold text-xs">Admin Copilot</div>
+              <div className="text-[10px] text-blue-200">Navigate & Query Banks</div>
+            </div>
+          </button>
+        ) : (
+          <div className="bg-white border border-slate-300 rounded-2xl shadow-2xl w-96 max-h-[500px] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5 duration-200">
+            {/* Chatbot Header */}
+            <div className="p-3.5 bg-slate-900 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+                  <Bot className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-xs">Super Admin AI Copilot</h4>
+                  <span className="text-[10px] text-blue-300">Ramesh • Master Governance</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsChatOpen(false)}
+                className="text-slate-400 hover:text-white p-1 rounded transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Navigation Prompts */}
+            <div className="p-2 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-1 text-[10px]">
+              <button
+                onClick={() => handleSendAdminChatMessage('Inspect CBA user logs')}
+                className="px-2 py-0.5 rounded-full bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-700 font-medium transition cursor-pointer"
+              >
+                Inspect CBA Logs
+              </button>
+              <button
+                onClick={() => handleSendAdminChatMessage('Show NAB policies')}
+                className="px-2 py-0.5 rounded-full bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-700 font-medium transition cursor-pointer"
+              >
+                NAB Policies
+              </button>
+              <button
+                onClick={() => handleSendAdminChatMessage('Navigate to Master Standards')}
+                className="px-2 py-0.5 rounded-full bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-700 font-medium transition cursor-pointer"
+              >
+                Master Standards
+              </button>
+              <button
+                onClick={() => handleSendAdminChatMessage('Add master standard with AI upload')}
+                className="px-2 py-0.5 rounded-full bg-white border border-slate-200 hover:border-blue-400 text-slate-700 hover:text-blue-700 font-medium transition cursor-pointer"
+              >
+                + AI Upload Standard
+              </button>
+            </div>
+
+            {/* Messages Body */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-2.5 custom-scrollbar bg-slate-50/40 text-xs min-h-[220px]">
+              {chatMessages.map((m) => (
+                <div
+                  key={m.id}
+                  className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[85%] p-2.5 rounded-xl leading-relaxed text-[11.5px] ${
+                      m.sender === 'user'
+                        ? 'bg-blue-600 text-white rounded-br-xs'
+                        : 'bg-white border border-slate-200 text-slate-800 rounded-bl-xs shadow-2xs'
+                    }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Input Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSendAdminChatMessage();
+              }}
+              className="p-2 bg-white border-t border-slate-200 flex items-center gap-1.5"
+            >
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Ask or navigate banks & standards..."
+                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 placeholder-slate-400 outline-none focus:bg-white focus:border-blue-500"
+              />
+              <button
+                type="submit"
+                disabled={!chatInput.trim()}
+                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white p-1.5 rounded-lg text-xs transition cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

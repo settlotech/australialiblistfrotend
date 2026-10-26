@@ -1,296 +1,289 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Search, 
-  Settings, 
-  Layers, 
-  Library,
-  Menu, 
-  MessageSquare, 
-  Crown, 
-  Building2, 
+  Bell, 
   ChevronDown, 
-  UserCheck, 
+  Menu, 
   PanelLeftClose, 
   PanelLeftOpen, 
   PanelRightClose, 
   PanelRightOpen, 
-  ShieldAlert,
-  FileText,
-  ArrowUpRight,
+  CheckCircle,
+  Crown,
+  Building2,
+  Layers,
+  KeyRound,
+  Users,
   X
 } from 'lucide-react';
 
-export default function Header({ 
-  currentUser, 
-  onOpenRoleModal, 
-  searchQuery = '', 
-  setSearchQuery, 
-  policies = {},
-  selectedPolicyId,
-  onSelectPolicy,
-  onSelectProduct,
-  onToggleMobileLeft, 
-  onToggleMobileRight, 
-  isLeftOpen, 
-  onToggleLeft, 
-  isRightOpen, 
-  onToggleRight, 
-  commentsCount, 
-  selectedBank, 
-  selectedProduct 
+export default function Header({
+  currentUser,
+  onSelectUser,
+  searchQuery,
+  setSearchQuery,
+  pendingReviewCount = 0,
+  onOpenMakerChecker,
+  onOpenNotifications,
+  onOpenBankUserManagerModal,
+  onOpenSuperAdminModal,
+  isLeftOpen,
+  onToggleLeft,
+  isRightOpen,
+  onToggleRight,
+  onToggleMobileLeft,
+  onToggleMobileRight,
+  currentView = 'WORKSPACE', // 'WORKSPACE' | 'SUPER_ADMIN'
+  onToggleSuperAdminView,
+  selectedBank = { id: 'cba', name: 'Commonwealth Bank of Australia' }
 }) {
-  const isManager = currentUser?.roleType === 'manager';
-  const isAdmin = currentUser?.type === 'admin';
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const searchContainerRef = useRef(null);
+  const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const roleDropdownRef = useRef(null);
 
-  // Close search dropdown on click outside
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target)) {
-        setIsSearchOpen(false);
+      if (roleDropdownRef.current && !roleDropdownRef.current.contains(e.target)) {
+        setIsRoleDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter policies matching search query
-  const searchResults = React.useMemo(() => {
-    const query = (searchQuery || '').trim().toLowerCase();
-    if (!query) return [];
-
-    const allPolicies = Object.values(policies);
-    return allPolicies.filter((p) => {
-      const matchTitle = (p.title || '').toLowerCase().includes(query);
-      const matchBreadcrumb = (p.breadcrumb || '').toLowerCase().includes(query);
-      const matchId = (p.id || '').toLowerCase().includes(query);
-      const matchVision = (p.visionStatement || '').toLowerCase().includes(query);
-      const matchCompliance = (p.complianceLevel || '').toLowerCase().includes(query);
-      
-      const matchClauses = (p.coreFrameworkClauses || []).some(c => 
-        (c.clauseId || '').toLowerCase().includes(query) ||
-        (c.title || '').toLowerCase().includes(query) ||
-        (c.content || '').toLowerCase().includes(query)
-      );
-
-      const matchAddenda = Object.values(p.bankCustomAddenda || {}).some(a => 
-        (a.sessionTimeout || '').toLowerCase().includes(query) ||
-        (a.mfaRule || '').toLowerCase().includes(query) ||
-        (a.customClause || '').toLowerCase().includes(query)
-      );
-
-      const matchProducts = (p.applicableProducts || []).some(prod => 
-        prod.toLowerCase().includes(query)
-      );
-
-      return matchTitle || matchBreadcrumb || matchId || matchVision || matchCompliance || matchClauses || matchAddenda || matchProducts;
-    });
-  }, [searchQuery, policies]);
-
-  const handleSelectSearchResult = (policy) => {
-    if (onSelectPolicy) onSelectPolicy(policy.id);
-    if (policy.applicableProducts?.[0] && onSelectProduct) {
-      onSelectProduct(policy.applicableProducts[0]);
+  const roles = [
+    {
+      id: 'marcus_vance',
+      name: 'Marcus Vance',
+      role: 'Bank Owner',
+      roleType: 'manager',
+      department: 'Executive Governance',
+      bankName: 'Commonwealth Bank (CBA)',
+      avatar: 'MV'
+    },
+    {
+      id: 'sarah_jenkins',
+      name: 'Sarah Jenkins',
+      role: 'Bank Employee',
+      roleType: 'employee',
+      department: 'Operations',
+      bankName: 'Commonwealth Bank (CBA)',
+      avatar: 'SJ'
     }
-    setSearchQuery('');
-    setIsSearchOpen(false);
+  ];
+
+  const superAdminRole = {
+    id: 'super_admin',
+    name: 'Ramesh',
+    role: 'Platform Owner',
+    roleType: 'admin',
+    department: 'Central Platform Owner',
+    bankName: 'Central Platform Owner',
+    avatar: 'R'
   };
 
+  const isSuperAdmin = currentUser?.roleType === 'admin';
+  const isBankOwner = currentUser?.roleType === 'manager';
+
   return (
-    <header className="h-14 border-b border-slate-200 bg-white px-3 sm:px-4 flex items-center justify-between select-none z-30 shadow-2xs">
-      {/* Left: Mobile Hierarchy Menu Button + Desktop Sidebar Toggle + Brand */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Mobile Left Sidebar Toggle */}
+    <header className="h-14 border-b border-[#e5e7eb] bg-white px-4 sm:px-6 flex items-center justify-between select-none z-30 shadow-2xs">
+      
+      {/* Left: Mobile Toggle + Desktop Left Sidebar Toggle + Institution Context */}
+      <div className="flex items-center gap-2.5">
         <button
           onClick={onToggleMobileLeft}
-          title="Toggle Architecture Hierarchy"
-          className="md:hidden p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition cursor-pointer"
+          title="Toggle Sidebar"
+          className="md:hidden p-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200"
         >
           <Menu className="w-4 h-4" />
         </button>
 
-        {/* Desktop Left Sidebar Toggle */}
-        {onToggleLeft && (
+        {onToggleLeft && currentView === 'WORKSPACE' && (
           <button
             onClick={onToggleLeft}
-            title={isLeftOpen ? "Collapse Left Hierarchy Tree" : "Expand Left Hierarchy Tree"}
-            className={`hidden md:flex p-1.5 rounded-lg border transition cursor-pointer ${
-              isLeftOpen 
-                ? 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900' 
-                : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
-            }`}
+            title={isLeftOpen ? "Collapse Left Pane" : "Expand Left Pane"}
+            className="hidden md:flex p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition cursor-pointer"
           >
             {isLeftOpen ? <PanelLeftClose className="w-4 h-4" /> : <PanelLeftOpen className="w-4 h-4" />}
           </button>
         )}
 
-        {/* Interactive Library Brand Pill with Smooth Hover Expansion */}
-        <div 
-          title="LibTrak OmniSpec Regulatory Library v2.4.0"
-          className="group relative flex items-center bg-slate-100 hover:bg-slate-200/80 border border-slate-300 rounded-lg p-1 transition-all duration-300 cursor-pointer shadow-2xs"
-        >
-          <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-white flex-shrink-0 shadow-2xs transition-transform duration-300 group-hover:scale-105">
-            <Library className="w-3.5 h-3.5 text-blue-400" />
-          </div>
-
-          <div className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out flex items-center whitespace-nowrap">
-            <span className="font-bold text-slate-900 text-xs tracking-tight pl-2 pr-1.5">
-              LibTrak OmniSpec Hub
-            </span>
-            <span className="text-[10px] font-mono font-bold text-slate-800 bg-white px-1.5 py-0.2 rounded border border-slate-300 mr-1 shadow-2xs">
-              v2.4.0
-            </span>
-          </div>
+        {/* Workspace Brand / Bank Context Badge */}
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200">
+          <Building2 className="w-4 h-4 text-slate-700" />
+          <span className="font-semibold text-slate-800 text-[13px] tracking-tight">
+            {currentView === 'SUPER_ADMIN' ? 'Platform Central Administration' : selectedBank.name}
+          </span>
+          <span className="text-[11px] font-mono text-slate-500 bg-white border border-slate-200 px-1.5 py-0.2 rounded">
+            {currentView === 'SUPER_ADMIN' ? 'Platform Owner' : 'CBA'}
+          </span>
         </div>
-
-        {/* Selected Bank Badge */}
-        {selectedBank && (
-          <div className="hidden lg:flex items-center gap-1.5 bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-lg text-xs">
-            <Building2 className="w-3.5 h-3.5 text-slate-700" />
-            <span className="font-bold text-slate-900 truncate max-w-[180px]">
-              {selectedBank.id.toUpperCase()} • Retail Standards
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* Center: Search Bar with Interactive Dropdown Results */}
-      <div ref={searchContainerRef} className="flex-1 max-w-xs sm:max-w-md mx-2 sm:mx-4 relative">
+      {/* Center: Search Bar */}
+      <div className="flex-1 max-w-xs sm:max-w-md mx-3 sm:mx-6 relative">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setIsSearchOpen(true);
-            }}
-            onFocus={() => {
-              if (searchQuery.trim()) setIsSearchOpen(true);
-            }}
-            placeholder="Search APRA clauses, CPS 234, CDR tokens, loan limits..."
-            className="w-full bg-slate-50 border border-slate-200 focus:bg-white focus:border-blue-500 rounded-md pl-7.5 sm:pl-8 pr-7 py-1 text-xs text-slate-900 placeholder-slate-400 outline-none transition"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search policies, operational clauses, SLAs..."
+            className="w-full bg-[#f8fafc] border border-slate-200 focus:bg-white focus:border-slate-400 rounded-lg pl-9 pr-8 py-1.5 text-[13px] text-slate-800 placeholder-slate-400 outline-none transition"
           />
           {searchQuery && (
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setIsSearchOpen(false);
-              }}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 cursor-pointer"
+              onClick={() => setSearchQuery('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
-
-        {/* Search Results Dropdown */}
-        {isSearchOpen && searchQuery.trim().length > 0 && (
-          <div className="absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200 rounded-xl shadow-2xl z-50 overflow-hidden max-h-80 overflow-y-auto custom-scrollbar animate-in fade-in duration-150">
-            <div className="px-3 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between text-[10.5px] font-bold text-slate-700 uppercase tracking-wider">
-              <span>Matching Standards ({searchResults.length})</span>
-              <span className="text-[9.5px] text-slate-500 font-normal">Click to navigate</span>
-            </div>
-
-            {searchResults.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-500">
-                No matching banking regulations or clauses found for "<strong className="text-slate-800">{searchQuery}</strong>".
-              </div>
-            ) : (
-              <div className="divide-y divide-slate-100">
-                {searchResults.map((p) => (
-                  <div
-                    key={p.id}
-                    onClick={() => handleSelectSearchResult(p)}
-                    className="p-2.5 hover:bg-slate-50 transition cursor-pointer group flex items-start justify-between gap-3 text-left"
-                  >
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-xs text-slate-900 group-hover:text-blue-700 transition">
-                          {p.title}
-                        </span>
-                        <span className="text-[10px] font-mono font-bold bg-slate-100 text-slate-900 px-1.5 py-0.2 rounded border border-slate-300">
-                          {p.latestVersion}
-                        </span>
-                      </div>
-                      <div className="text-[10.5px] text-slate-600 truncate max-w-[280px] sm:max-w-[360px]">
-                        {p.breadcrumb}
-                      </div>
-                      <div className="text-[10.5px] text-slate-700 line-clamp-1 italic font-medium">
-                        "{p.visionStatement}"
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-1 flex-shrink-0 mt-1">
-                      <span className="text-[9.5px] font-bold bg-slate-100 text-slate-900 px-1.5 py-0.2 rounded border border-slate-300">
-                        {p.complianceLevel}
-                      </span>
-                      <ArrowUpRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-blue-600 transition" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Right: Feed Toggle & User Profile Switcher */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Desktop Feed Toggle Button */}
-        {onToggleRight && (
+      {/* Right: Clean Notification Bell + Bank User Manager + Role Selector */}
+      <div className="flex items-center gap-2">
+        
+        {/* Bank User & Access Control Management (Bank Owner Feature) */}
+        {isBankOwner && onOpenBankUserManagerModal && (
           <button
-            onClick={onToggleRight}
-            title={isRightOpen ? "Collapse Contextual Feed" : "Expand Contextual Feed"}
-            className={`hidden lg:flex items-center gap-1.5 border px-2.5 py-1 rounded-lg text-xs font-medium transition cursor-pointer ${
-              isRightOpen 
-                ? 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100' 
-                : 'bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100'
-            }`}
+            onClick={onOpenBankUserManagerModal}
+            title="Manage Bank Users, Clearances & Policy Authoring Permissions"
+            className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-2xs transition cursor-pointer"
           >
-            <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
-            <span>Feed</span>
-            <span className="text-[10px] font-mono bg-slate-200 px-1 rounded-full font-bold">
-              {commentsCount}
-            </span>
+            <Users className="w-3.5 h-3.5 text-slate-600" />
+            <span>Bank Users & Access</span>
           </button>
         )}
 
-        {/* Mobile Feed Toggle Button */}
+        {/* Clean Notification Bell Icon with Badge Count */}
         <button
-          onClick={onToggleMobileRight}
-          title="Toggle Contextual Feed"
-          className="lg:hidden flex items-center gap-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-2 py-1 rounded text-xs text-slate-700 font-medium transition cursor-pointer"
+          onClick={onOpenNotifications}
+          title="System Notifications & Regulatory Compliance Codes"
+          className="relative p-2 rounded-lg text-slate-600 hover:text-slate-900 bg-white hover:bg-slate-50 transition cursor-pointer border border-slate-200 shadow-2xs"
         >
-          <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
-          <span className="text-[10px] font-mono bg-slate-200 px-1 rounded-full font-bold">
-            {commentsCount}
+          <Bell className="w-4 h-4 text-slate-700" />
+          <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            {pendingReviewCount > 0 ? pendingReviewCount : 2}
           </span>
         </button>
 
-        {/* User Account / Role Switcher Pill */}
-        <button
-          onClick={onOpenRoleModal}
-          className="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-300 rounded-lg p-1.5 sm:px-2.5 sm:py-1 transition cursor-pointer text-left shadow-2xs group"
-        >
-          <div className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs text-white shadow-2xs ${
-            isAdmin ? 'bg-amber-600' : isManager ? 'bg-indigo-700' : 'bg-slate-800'
-          }`}>
-            {currentUser?.avatar || 'DM'}
-          </div>
+        {/* Feed Drawer Toggle (Right) */}
+        {onToggleRight && currentView === 'WORKSPACE' && (
+          <button
+            onClick={onToggleRight}
+            title={isRightOpen ? "Collapse Comments/Chat Panel" : "Expand Comments/Chat Panel"}
+            className="hidden md:flex p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+          >
+            {isRightOpen ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+          </button>
+        )}
 
-          <div className="hidden sm:block text-left truncate max-w-[130px]">
-            <div className="text-xs font-bold text-slate-900 truncate leading-tight group-hover:text-blue-600 transition">
-              {currentUser?.name || 'David Miller'}
+        {/* Role Selector Pill */}
+        <div ref={roleDropdownRef} className="relative">
+          <button
+            onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
+            className="flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-left transition cursor-pointer shadow-2xs"
+          >
+            <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-[11px] text-white bg-[#1e293b]">
+              {currentUser?.avatar || (currentUser?.roleType === 'admin' ? 'R' : currentUser?.roleType === 'manager' ? 'MV' : 'SJ')}
             </div>
-            <div className="text-[10px] text-slate-500 truncate">
-              {isAdmin ? 'Master Admin' : isManager ? 'Risk Approver' : 'Submitter (Employee)'}
+            <div className="hidden sm:block">
+              <div className="text-[12.5px] font-semibold text-slate-800 leading-tight">
+                {currentUser?.name || 'Marcus Vance'}
+              </div>
+              <div className="text-[10.5px] text-slate-500">
+                {currentUser?.roleType === 'admin' ? 'Platform Owner' : currentUser?.roleType === 'manager' ? 'Bank Owner' : 'Bank Employee'}
+              </div>
             </div>
-          </div>
+            <ChevronDown className="w-3 h-3 text-slate-400" />
+          </button>
 
-          <ChevronDown className="w-3 h-3 text-slate-400 group-hover:text-slate-700 transition hidden sm:block" />
-        </button>
+          {/* Role Dropdown Menu */}
+          {isRoleDropdownOpen && (
+            <div className="absolute right-0 top-full mt-1.5 w-72 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in duration-100">
+              <div className="px-3.5 py-2 border-b border-slate-100 bg-slate-50/70">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Select Bank User</span>
+                <p className="text-[11.5px] text-slate-600 mt-0.5">Switch between Bank Owner and Employee</p>
+              </div>
+              <div className="divide-y divide-slate-100">
+                {roles.map((r) => {
+                  const isActive = currentUser?.id === r.id;
+                  return (
+                    <button
+                      key={r.id}
+                      onClick={() => {
+                        if (onSelectUser) onSelectUser(r);
+                        setIsRoleDropdownOpen(false);
+                      }}
+                      className={`w-full p-2.5 text-left flex items-start gap-2.5 hover:bg-slate-50 transition cursor-pointer ${
+                        isActive ? 'bg-slate-100/70' : ''
+                      }`}
+                    >
+                      <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs text-white bg-[#1e293b] flex-shrink-0">
+                        {r.avatar}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[12.5px] font-bold text-slate-800 flex items-center justify-between">
+                          <span>{r.name}</span>
+                          {isActive && <CheckCircle className="w-3.5 h-3.5 text-slate-800" />}
+                        </div>
+                        <div className="text-[11.5px] text-slate-600 font-medium">{r.role}</div>
+                        <div className="text-[10.5px] text-slate-400">{r.bankName}</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Dedicated Separate Link for Super Admin (Platform Owner: Ramesh) */}
+              <div className="p-2 border-t border-slate-100 bg-amber-50/40">
+                <button
+                  onClick={() => {
+                    setIsRoleDropdownOpen(false);
+                    if (onSelectUser) onSelectUser(superAdminRole);
+                    else if (onOpenSuperAdminModal) onOpenSuperAdminModal();
+                  }}
+                  className={`w-full p-2 text-left flex items-center justify-between rounded-lg hover:bg-amber-100/70 transition cursor-pointer ${
+                    currentUser?.roleType === 'admin' ? 'bg-amber-100/80' : ''
+                  }`}
+                  title="Direct access to Platform Owner (Ramesh)"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs text-amber-900 bg-amber-200 flex-shrink-0">
+                      👑
+                    </div>
+                    <div>
+                      <div className="text-[12px] font-bold text-slate-900 flex items-center gap-1.5">
+                        <span>Ramesh</span>
+                        <span className="text-[9.5px] font-semibold text-amber-800 bg-amber-100 px-1 py-0.2 rounded border border-amber-200">Platform Owner</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500">Separate Super Admin Gateway</div>
+                    </div>
+                  </div>
+                  <Crown className="w-3.5 h-3.5 text-amber-600" />
+                </button>
+              </div>
+
+              {/* Bank Owner Quick Option: Manage Bank Users */}
+              {isBankOwner && onOpenBankUserManagerModal && (
+                <div className="p-2 border-t border-slate-100 bg-slate-50/50">
+                  <button
+                    onClick={() => {
+                      setIsRoleDropdownOpen(false);
+                      onOpenBankUserManagerModal();
+                    }}
+                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold text-slate-700 hover:text-slate-900 bg-white border border-slate-200 hover:bg-slate-100 transition cursor-pointer"
+                  >
+                    <Users className="w-3.5 h-3.5 text-slate-600" />
+                    <span>Manage Bank Users & Clearances</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );

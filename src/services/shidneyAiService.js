@@ -34,16 +34,15 @@ function buildSystemPrompt(context = {}) {
    - Answer ONLY what the user asked directly.
 2. **CLICKABLE ACTION LINKS (VERY IMPORTANT):**
    - Whenever you refer to policies, products, configuring rules, change requests, or navigating to any feature, include clickable action links in your text using this exact markdown syntax:
-     - To open Personal Loans: [Open Personal Loans](action:policy:aps-220-credit-risk)
+     - To open Credit Card Product Suite: [Open Credit Cards](action:policy:credit-card-limits-policy)
+     - To open Personal Loans: [Open Personal Loans](action:policy:personal-loans-assessment-sop)
      - To open Configure modal: [Configure](action:modal:edit-spec)
      - To open Export Certificate modal: [Export Certificate](action:modal:export-cert)
      - To open Submit Change Request form: [Submit Change Request](action:feed:request-change)
      - To switch user role: [Switch Role](action:role:toggle)
-     - To open CPS 234 Authentication: [Open CPS 234 Auth Policy](action:policy:oauth-sso)
-     - To open CDR & Privacy Policy: [Open Privacy & CDR Governance](action:policy:cdr-data-privacy)
-     - To open AUSTRAC Financial Crime: [Open AUSTRAC AML & Sanctions](action:policy:aml-sanctions-screening)
-     - To open NPP Real-Time Payments: [Open NPP Real-Time Payments](action:policy:npp-iso20022)
-     - To open CPS 230 Operational Resilience: [Open CPS 230 Resilience](action:policy:cps-230-continuity)
+     - To open CPS 234 Authentication: [Open CPS 234 Auth Policy](action:policy:remote-access-security-policy)
+     - To open CDR & Privacy Policy: [Open Privacy & CDR Governance](action:policy:cdr-privacy-policy)
+     - To open AUSTRAC Financial Crime: [Open AUSTRAC AML & Sanctions](action:policy:aml-ctf-screening-policy)
    - When the user clicks these links, the application immediately opens and navigates to that exact screen!
 3. **GREETING & NEW EMPLOYEE INTRODUCTIONS:**
    - If the user says "hi", "hello", "hey": reply naturally:
@@ -201,19 +200,42 @@ Would you like me to guide you around here, or is there anything specific you'd 
     return {
       text: `I'm **Shidney**, your banking co-pilot. Here is what I can help you with:
 
-- **1. Lending & Credit Rules:** [Open Personal Loans](action:policy:aps-220-credit-risk) (APRA APS 220 + NCCP rules).
-- **2. Security & Auth Standards:** [Open CPS 234 Auth Policy](action:policy:oauth-sso) (OAuth 2.0 PKCE, session timeouts).
-- **3. Configure Bank Settings:** [Configure](action:modal:edit-spec) to adjust loan limits or verification streams.
-- **4. Change Requests:** [Submit Change Request](action:feed:request-change) for Risk Committee review.
-- **5. Compliance Certification:** [Export Certificate](action:modal:export-cert) to generate signed audit artifacts.
+- **1. Credit Card Product Suite & Direct Docs:** [Open Credit Cards](action:policy:credit-card-limits-policy) (Tiered limits & in-system operational specifications).
+- **2. Lending & Credit Rules:** [Open Personal Loans](action:policy:personal-loans-assessment-sop) (APRA APS 220 + NCCP rules).
+- **3. Security & Auth Standards:** [Open CPS 234 Auth Policy](action:policy:remote-access-security-policy) (OAuth 2.0 PKCE, session timeouts).
+- **4. Configure Bank Settings:** [Configure](action:modal:edit-spec) to adjust loan limits or verification streams.
+- **5. Change Requests:** [Submit Change Request](action:feed:request-change) for Risk Committee review.
+- **6. Compliance Certification:** [Export Certificate](action:modal:export-cert) to generate signed audit artifacts.
 
 Would you like me to elaborate on any of these?`,
     };
   }
 
-  if (q.includes('loan') || q.includes('lending') || q.includes('aps 220') || q.includes('credit') || q.includes('dti') || q.includes('buffer') || q.includes('50,000') || q.includes('50000')) {
+  if (q.includes('credit card') || q.includes('credit-card') || q.includes('card') || (q.includes('product') && !q.includes('loan'))) {
     return {
-      text: `Under **APRA APS 220** and the National Consumer Credit Protection (NCCP) Act, our personal loan assessment enforces three key safeguards:
+      text: `Navigated to **Credit Card Product Suite & Issuance Policy** (Master Product Policy).
+
+This master product container governs consumer credit issuance and holds 3 direct in-system operational documents:
+1. **CBA-DOC-001:** Core Credit Card Issuance & Underwriting Specification (+3.0% serviceability buffer, HEM baseline).
+2. **CBA-SOP-002:** Digital KYC & Instant Card Provisioning Procedure (Biometric face liveness >= 92%, DVS verification).
+3. **CBA-LMT-003:** Daily Spending Limits & Escalation Ceiling Matrix (Daily ATM $1,000 AUD, tap-and-go $200).
+
+The center workspace has re-rendered to show this product policy and all active direct documents.
+
+Quick Actions:
+- [Open Credit Card Product Suite](action:policy:credit-card-limits-policy)
+- [Configure Credit Card Limits](action:modal:edit-spec)
+- [Export Compliance Audit Certificate](action:modal:export-cert)
+
+Would you like me to elaborate on any of the direct documents or approval tiers?`,
+    };
+  }
+
+  if (q.includes('loan') || q.includes('lending') || q.includes('aps 220') || q.includes('overdraft') || q.includes('50,000') || q.includes('50000')) {
+    return {
+      text: `Navigated to **Personal Loans & Overdraft Assessment Procedure** (APRA APS 220).
+
+Under **APRA APS 220** and the National Consumer Credit Protection (NCCP) Act, personal loan assessment enforces three key safeguards:
 
 1. **3.00% Serviceability Buffer:** All loan interest rate assessments incorporate a +3.00% buffer above the customer rate.
 2. **Debt-to-Income (DTI) Cap:** Approvals exceeding 6.0x DTI are capped at < 5% of portfolio volume.
@@ -222,7 +244,7 @@ Would you like me to elaborate on any of these?`,
 For **${bankId}**, the current configured maximum limit is **$50,000 AUD**.
 
 Quick Actions:
-- [Open Personal Loans Policy](action:policy:aps-220-credit-risk)
+- [Open Personal Loans Policy](action:policy:personal-loans-assessment-sop)
 - [Configure Personal Loans](action:modal:edit-spec)
 - [Submit a Loan Policy Change Request](action:feed:request-change)
 
@@ -234,14 +256,15 @@ Would you like me to elaborate on any specific calculation?`,
     return {
       text: `Here is where key options are located in the workspace:
 
+- **Credit Card Product Suite:** Click [Open Credit Cards](action:policy:credit-card-limits-policy).
+- **Personal Loans:** Click [Open Personal Loans](action:policy:personal-loans-assessment-sop).
 - **Configure:** Click the blue [Configure](action:modal:edit-spec) button at the top right of the center pane.
 - **Export Certificate:** Click [Export Certificate](action:modal:export-cert) at the top right of the center workspace.
 - **Submit Change Request:** Click [Submit Change Request](action:feed:request-change) or switch to the **Review** tab in this feed.
 - **Switch Role:** Click [Switch Role](action:role:toggle) in the top header to toggle between Submitter and Approver.
-- **Personal Loans:** Click [Open Personal Loans](action:policy:aps-220-credit-risk).
-- **CPS 234 Information Security:** Click [Open CPS 234 Auth Policy](action:policy:oauth-sso).
-- **Data Privacy & CDR:** Click [Open Privacy & CDR Governance](action:policy:cdr-data-privacy).
-- **AUSTRAC AML:** Click [Open AUSTRAC AML & Sanctions](action:policy:aml-sanctions-screening).
+- **CPS 234 Information Security:** Click [Open CPS 234 Auth Policy](action:policy:remote-access-security-policy).
+- **Data Privacy & CDR:** Click [Open Privacy & CDR Governance](action:policy:cdr-privacy-policy).
+- **AUSTRAC AML:** Click [Open AUSTRAC AML & Sanctions](action:policy:aml-ctf-screening-policy).
 
 Click any link above to jump directly there!`,
     };

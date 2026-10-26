@@ -30,14 +30,7 @@ export default function ShidneyAIChat({
 }) {
   const userName = currentUser?.name?.split(' ')[0] || 'David';
 
-  const [messages, setMessages] = useState([
-    {
-      id: 'welcome-1',
-      sender: 'assistant',
-      time: 'Just now',
-      text: `Hi ${userName}! How can I help you today?`,
-    }
-  ]);
+  const [messages, setMessages] = useState([]);
 
   const [inputPrompt, setInputPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -59,18 +52,36 @@ export default function ShidneyAIChat({
     if (!actionUrl) return;
 
     if (actionUrl.startsWith('action:policy:')) {
-      const policyId = actionUrl.replace('action:policy:', '').trim();
+      let policyId = actionUrl.replace('action:policy:', '').trim();
+      // Resolve aliases
+      if (policyId === 'aps-220-credit-risk') policyId = 'personal-loans-assessment-sop';
+      if (policyId === 'oauth-sso') policyId = 'remote-access-security-policy';
+      if (policyId === 'cdr-data-privacy') policyId = 'cdr-privacy-policy';
+      if (policyId === 'aml-sanctions-screening') policyId = 'aml-ctf-screening-policy';
+      if (policyId === 'credit-cards' || policyId === 'credit-card') policyId = 'credit-card-limits-policy';
+
       if (onSelectPolicy) onSelectPolicy(policyId);
-      const targetPolicy = policies[policyId];
+      
+      const targetPolicy = Array.isArray(policies) 
+        ? policies.find(p => p.id === policyId) 
+        : policies?.[policyId];
       if (targetPolicy?.applicableProducts?.[0] && onSelectProduct) {
         onSelectProduct(targetPolicy.applicableProducts[0]);
       }
     } else if (actionUrl.startsWith('action:product:')) {
       const productId = actionUrl.replace('action:product:', '').trim();
       if (onSelectProduct) onSelectProduct(productId);
-      const matchingPolicy = Object.values(policies).find(p => (p.applicableProducts || []).includes(productId));
-      if (matchingPolicy && onSelectPolicy) {
-        onSelectPolicy(matchingPolicy.id);
+      if (productId.includes('card')) {
+        if (onSelectPolicy) onSelectPolicy('credit-card-limits-policy');
+      } else if (productId.includes('loan')) {
+        if (onSelectPolicy) onSelectPolicy('personal-loans-assessment-sop');
+      } else {
+        const matchingPolicy = Array.isArray(policies)
+          ? policies.find(p => (p.applicableProducts || []).includes(productId) || p.product_category?.toLowerCase().includes(productId))
+          : Object.values(policies || {}).find(p => (p.applicableProducts || []).includes(productId));
+        if (matchingPolicy && onSelectPolicy) {
+          onSelectPolicy(matchingPolicy.id);
+        }
       }
     } else if (actionUrl === 'action:modal:edit-spec') {
       if (onOpenEditModal) onOpenEditModal();
@@ -130,20 +141,45 @@ export default function ShidneyAIChat({
   const handleStartNewConvo = () => {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     setIsSpeaking(false);
-    setMessages([
-      {
-        id: `welcome-${Date.now()}`,
-        sender: 'assistant',
-        time: 'Just now',
-        text: `Hi ${userName}! How can I help you today?`,
-      }
-    ]);
+    setMessages([]);
   };
 
   // Handle submitting user message
   const handleSendMessage = async (textToSend) => {
     const text = (textToSend || inputPrompt).trim();
     if (!text || isLoading) return;
+
+    // Detect if the user asks to go to or asks about a product / policy -> trigger instant workspace re-render
+    const lower = text.toLowerCase();
+    let detectedPolicyId = null;
+    let detectedProduct = null;
+
+    if (lower.includes('credit card') || lower.includes('credit-card') || lower.includes('card product') || (lower.includes('card') && !lower.includes('standard'))) {
+      detectedPolicyId = 'credit-card-limits-policy';
+      detectedProduct = 'credit-cards';
+    } else if (lower.includes('personal loan') || (lower.includes('loan') && !lower.includes('credit card')) || lower.includes('overdraft')) {
+      detectedPolicyId = 'personal-loans-assessment-sop';
+      detectedProduct = 'personal-loans';
+    } else if (lower.includes('onboard') || lower.includes('identity verification') || lower.includes('dvs')) {
+      detectedPolicyId = 'customer-onboarding-sop';
+    } else if (lower.includes('commercial') || lower.includes('kyc') || lower.includes('ubo') || lower.includes('business account')) {
+      detectedPolicyId = 'commercial-kyc-sop';
+    } else if (lower.includes('remote access') || lower.includes('security') || lower.includes('infosec') || lower.includes('cps 234') || lower.includes('mfa')) {
+      detectedPolicyId = 'remote-access-security-policy';
+    } else if (lower.includes('privileged') || lower.includes('pam') || lower.includes('admin access') || lower.includes('segregation of duties')) {
+      detectedPolicyId = 'privileged-access-sop';
+    } else if (lower.includes('aml') || lower.includes('ctf') || lower.includes('austrac') || lower.includes('sanction') || lower.includes('financial crime')) {
+      detectedPolicyId = 'aml-ctf-screening-policy';
+    } else if (lower.includes('cdr') || lower.includes('privacy') || lower.includes('open banking') || lower.includes('app 11') || lower.includes('retention')) {
+      detectedPolicyId = 'cdr-privacy-policy';
+    }
+
+    if (detectedPolicyId && onSelectPolicy) {
+      onSelectPolicy(detectedPolicyId);
+    }
+    if (detectedProduct && onSelectProduct) {
+      onSelectProduct(detectedProduct);
+    }
 
     const userMsg = {
       id: `u-${Date.now()}`,
@@ -307,6 +343,17 @@ export default function ShidneyAIChat({
     <div className="flex flex-col h-full bg-slate-50/40">
       {/* Messages Scroll Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+        {messages.length === 0 && (
+          <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 select-none">
+            <div className="w-10 h-10 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center mb-2.5 shadow-2xs">
+              <Sparkles className="w-5 h-5 text-blue-600" />
+            </div>
+            <p className="font-bold text-slate-700 text-xs">Shidney AI Copilot</p>
+            <p className="text-[11px] text-slate-400 mt-1 max-w-[210px] leading-relaxed">
+              Ask policy questions or verify compliance criteria in real-time.
+            </p>
+          </div>
+        )}
         {messages.map((msg) => {
           const isUser = msg.sender === 'user';
 
